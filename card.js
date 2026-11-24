@@ -54,30 +54,30 @@ function buildMessage(params, baseUrl) {
   const viewUrl = new URL("view.html", baseUrl).href + toQuery(params);
   return {
     type: "flex",
-    altText: `${i.name}｜${i.company} 的電子名片`,
+    altText: `${i.name} ${i.en}｜KIND PORT ${i.title}`,
     contents: {
       type: "bubble",
       size: "mega",
       hero: {
         type: "image", url: new URL("hero.jpg", baseUrl).href,
-        size: "full", aspectRatio: "16:10", aspectMode: "cover",
-        action: { type: "uri", label: "開啟電子名片", uri: viewUrl },
+        size: "full", aspectRatio: "1.6:1", aspectMode: "cover",
+        action: { type: "uri", label: "open", uri: viewUrl },
       },
       body: {
-        type: "box", layout: "vertical", paddingAll: "20px", spacing: "sm",
+        type: "box", layout: "vertical", paddingAll: "20px", paddingBottom: "8px",
         contents: [
           {
             type: "box", layout: "baseline", spacing: "md",
             contents: [
-              { type: "text", text: i.name, size: "xl", weight: "bold", color: NAVY, flex: 0 },
-              { type: "text", text: i.en, size: "md", weight: "bold", color: NAVY, flex: 0 },
+              { type: "text", text: i.name, size: "xxl", weight: "bold", color: NAVY, flex: 0 },
+              { type: "text", text: i.en, size: "lg", weight: "bold", color: NAVY, flex: 0 },
             ],
           },
-          { type: "text", text: `${i.title}・${i.company}`, size: "sm", color: "#5A7FA3", wrap: true },
+          { type: "text", text: `${i.title}・${i.company}`, size: "md", color: "#5A7FA3", margin: "sm", wrap: true },
         ],
       },
       footer: {
-        type: "box", layout: "vertical", paddingAll: "14px", paddingTop: "0px",
+        type: "box", layout: "vertical", paddingAll: "16px", paddingTop: "8px",
         contents: [{
           type: "button", style: "primary", color: NAVY, height: "md",
           action: { type: "uri", label: "開啟電子名片", uri: viewUrl },
