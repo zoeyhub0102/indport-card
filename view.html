@@ -34,11 +34,6 @@
   .svc b{font-size:15px}
   .svc p{margin:3px 0 0;font-size:13px;line-height:1.6;color:var(--light)}
   .share{margin:22px 24px 0}
-  #tip{display:none;position:fixed;inset:0;background:rgba(2,30,60,.55);align-items:flex-end;justify-content:center;z-index:9}
-  #tip .box{background:#fff;width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:24px 24px 34px;color:var(--navy)}
-  #tip h3{margin:0 0 10px;font-size:18px}
-  #tip ol{margin:0;padding-left:20px;font-size:15px;line-height:1.9}
-  #tip .ok{margin-top:18px;width:100%}
   .foot{text-align:center;font-size:11px;color:#8AA5C4;margin-top:22px}
 </style>
 </head>
@@ -61,7 +56,6 @@
   <div class="actions">
     <a class="btn primary" id="call">📞 撥打電話</a>
     <a class="btn outline" id="mail">✉️ 寄送 Email</a>
-    <a class="btn outline full" id="save">👤 儲存聯絡人</a>
   </div>
 
   <section class="services" id="services">
@@ -73,15 +67,6 @@
   <div class="share">
     <a class="btn primary full" id="forward" style="width:100%">轉傳這張名片</a>
   </div>
-  <div id="tip"><div class="box">
-    <h3>在 LINE 裡無法直接儲存聯絡人</h3>
-    <ol>
-      <li>點畫面右下角（或右上角）的 <b>⋯</b> 選單</li>
-      <li>選「<b>用預設瀏覽器開啟</b>」或「在 Safari 開啟」</li>
-      <li>在新開的頁面再按一次「<b>儲存聯絡人</b>」</li>
-    </ol>
-    <button class="btn primary ok">知道了</button>
-  </div></div>
   <div class="foot">© 好口國際有限公司 Kind Port International Limited</div>
 </div>
 
@@ -110,32 +95,6 @@ else $("svcList").innerHTML = SERVICES.map(([t, d]) => `<div class="svc"><b>${t}
 // 轉傳：打開 LIFF 分享頁，帶同樣的名片資料
 $("forward").href = `https://liff.line.me/${LIFF_ID}${toQuery(p)}`;
 
-// 儲存聯絡人
-// LINE 內建瀏覽器無法存聯絡人 → 顯示提示，請對方改用 Safari / Chrome 開啟
-const inLine = /Line\//i.test(navigator.userAgent);
-const custom = ["name", "phone", "email"].some((k) => p[k]);
-$("save").href = "#";
-$("save").onclick = (e) => {
-  e.preventDefault();
-  if (inLine) { $("tip").style.display = "flex"; return; }
-  if (!custom) location.href = new URL("contact.vcf", location.href).href;
-  else downloadVcf();
-};
-$("tip").onclick = () => ($("tip").style.display = "none");
-
-function downloadVcf() {
-  const vcf = [
-    "BEGIN:VCARD", "VERSION:3.0",
-    `N:;${i.name};;;`, `FN:${i.name} ${i.en}`,
-    `ORG:${i.company}`, `TITLE:${i.title} ${i.title_en}`,
-    `TEL;TYPE=CELL:${i.phone}`, `EMAIL;TYPE=WORK:${i.email}`,
-    "END:VCARD",
-  ].join("\r\n");
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([vcf], { type: "text/vcard;charset=utf-8" }));
-  a.download = `${i.name}.vcf`;
-  document.body.appendChild(a); a.click(); a.remove();
-}
 </script>
 </body>
 </html>
