@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>好口國際｜電子名片</title>
+<style>
+  body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;background:#024D87;color:#fff;
+       min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;box-sizing:border-box}
+  img{width:220px;border-radius:12px;margin-bottom:20px}
+  button{background:#fff;color:#024D87;border:0;border-radius:999px;font-size:17px;font-weight:700;padding:14px 36px;margin-top:16px}
+  #msg{font-size:14px;color:#BFD3EB;margin-top:14px;min-height:20px}
+</style>
+</head>
+<body>
+  <img src="hero.jpg" alt="KIND PORT">
+  <div id="title">好口國際有限公司 電子名片</div>
+  <button id="share">選擇好友，傳送名片</button>
+  <div id="msg">載入中…</div>
+
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script src="card.js"></script>
+<script>
+// ★ 步驟 3 拿到 LIFF ID 後，貼在這裡
+const LIFF_ID = "請貼上你的LIFF_ID";
+
+const msg = (t) => (document.getElementById("msg").textContent = t);
+const params = Object.fromEntries(new URLSearchParams(location.search));
+const shareUrl = `https://liff.line.me/${LIFF_ID}${location.search}`;
+const message = buildCard(params, location.href, shareUrl);
+
+async function share() {
+  if (!liff.isApiAvailable("shareTargetPicker")) {
+    msg("請在 LINE App 裡開啟這個連結");
+    return;
+  }
+  try {
+    const res = await liff.shareTargetPicker([message], { isMultiple: true });
+    if (res) {
+      msg("已送出！");
+      if (liff.isInClient()) setTimeout(() => liff.closeWindow(), 800);
+    } else {
+      msg("已取消");
+    }
+  } catch (e) {
+    msg("傳送失敗：" + e.message);
+  }
+}
+
+document.getElementById("share").onclick = share;
+
+liff.init({ liffId: LIFF_ID }).then(() => {
+  if (!liff.isLoggedIn()) { liff.login({ redirectUri: location.href }); return; }
+  msg("");
+  share(); // 開啟後自動跳出選好友畫面；若沒跳出，按上方按鈕即可
+}).catch((e) => msg("初始化失敗：" + e.message));
+</script>
+</body>
+</html>
