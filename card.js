@@ -3,7 +3,7 @@
 
 const LIFF_ID = "2012778268-Og4OqcYs";
 
-const NAVY = "#024D87";
+const NAVY = "#005491";
 const LIGHT = "#BFD3EB";
 
 const DEFAULTS = {
@@ -59,15 +59,21 @@ function buildMessage(params, baseUrl) {
       type: "bubble",
       size: "mega",
       hero: {
-        type: "image", url: new URL("card-front.jpg", baseUrl).href,
+        type: "image", url: new URL("hero.jpg", baseUrl).href,
         size: "full", aspectRatio: "16:10", aspectMode: "cover",
         action: { type: "uri", label: "開啟電子名片", uri: viewUrl },
       },
       body: {
         type: "box", layout: "vertical", paddingAll: "20px", spacing: "sm",
         contents: [
-          { type: "text", text: i.name, size: "xl", weight: "bold", color: NAVY },
-          { type: "text", text: `${i.title}・${i.company}`, size: "sm", color: "#5B7FA6", wrap: true },
+          {
+            type: "box", layout: "baseline", spacing: "md",
+            contents: [
+              { type: "text", text: i.name, size: "xl", weight: "bold", color: NAVY, flex: 0 },
+              { type: "text", text: i.en, size: "md", weight: "bold", color: NAVY, flex: 0 },
+            ],
+          },
+          { type: "text", text: `${i.title}・${i.company}`, size: "sm", color: "#5A7FA3", wrap: true },
         ],
       },
       footer: {
