@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>好口國際｜電子名片</title>
+<style>
+  :root{--navy:#024D87;--light:#BFD3EB;--soft:#EEF4FB}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"PingFang TC","Noto Sans TC",sans-serif;background:var(--soft);color:var(--navy)}
+  .wrap{max-width:480px;margin:0 auto;background:#fff;min-height:100vh;padding-bottom:28px}
+  .hero{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+  .info{position:relative;padding:24px 24px 64px;overflow:hidden}
+  .info>*{position:relative;z-index:1}
+  .company{font-size:13px;font-weight:700;letter-spacing:.5px}
+  .company small{display:block;font-weight:400;color:#5B7FA6;margin-top:2px}
+  hr{border:0;border-top:1px solid var(--light);margin:16px 0}
+  .title{font-size:15px}
+  .title-en{font-size:12px;color:#5B7FA6;margin-top:2px}
+  .name{margin-top:8px;font-size:30px;font-weight:800;letter-spacing:1px}
+  .name span{font-size:18px;font-weight:700;letter-spacing:0;margin-left:6px}
+  .contact{margin-top:12px;font-size:15px;line-height:1.7;position:relative;z-index:1}
+  .contact a{color:var(--navy);text-decoration:none}
+  .info>.wave{position:absolute;right:0;bottom:0;width:48%;opacity:.9;z-index:0}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:20px 24px 4px}
+  .btn{display:flex;align-items:center;justify-content:center;gap:6px;height:48px;border-radius:12px;font-size:15px;font-weight:700;text-decoration:none;border:0;cursor:pointer;font-family:inherit}
+  .primary{background:var(--navy);color:#fff}
+  .outline{background:#fff;color:var(--navy);border:1.5px solid var(--navy)}
+  .full{grid-column:1/-1}
+  .services{margin:22px 24px 0;background:var(--navy);color:#fff;border-radius:16px;padding:22px}
+  .services .k{font-size:12px;color:var(--light);font-weight:700;letter-spacing:1px}
+  .services h2{margin:4px 0 6px;font-size:21px}
+  .svc{margin-top:14px}
+  .svc b{font-size:15px}
+  .svc p{margin:3px 0 0;font-size:13px;line-height:1.6;color:var(--light)}
+  .share{margin:22px 24px 0}
+  .foot{text-align:center;font-size:11px;color:#8AA5C4;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img class="hero" src="hero.jpg" alt="KIND PORT">
+  <div class="info">
+    <div class="company" id="company"></div>
+    <hr>
+    <div class="title" id="title"></div>
+    <div class="title-en" id="title_en"></div>
+    <div class="name" id="name"></div>
+    <div class="contact">
+      <div><a id="phone"></a></div>
+      <div><a id="email"></a></div>
+    </div>
+    <img class="wave" src="wave.png" alt="">
+  </div>
+
+  <div class="actions">
+    <a class="btn primary" id="call">📞 撥打電話</a>
+    <a class="btn outline" id="mail">✉️ 寄送 Email</a>
+    <button class="btn outline full" id="save">👤 儲存聯絡人</button>
+  </div>
+
+  <section class="services" id="services">
+    <div class="k">KIND PORT</div>
+    <h2>服務項目</h2>
+    <div id="svcList"></div>
+  </section>
+
+  <div class="share">
+    <a class="btn primary full" id="forward" style="width:100%">轉傳這張名片</a>
+  </div>
+  <div class="foot">© 好口國際有限公司 Kind Port International Limited</div>
+</div>
+
+<script src="card.js"></script>
+<script>
+const p = readParams();
+const i = { ...DEFAULTS, ...p };
+const $ = (id) => document.getElementById(id);
+
+$("company").innerHTML = `${i.company}<small>${i.company_en}</small>`;
+$("title").textContent = i.title;
+$("title_en").textContent = i.title_en;
+$("name").innerHTML = `${i.name}<span>${i.en}</span>`;
+$("phone").textContent = displayPhone(i.phone);
+$("phone").href = `tel:${i.phone}`;
+$("email").textContent = i.email;
+$("email").href = `mailto:${i.email}`;
+$("call").href = `tel:${i.phone}`;
+$("mail").href = `mailto:${i.email}`;
+document.title = `${i.name}｜${i.company}`;
+
+// 簡易版不顯示服務項目
+if (p.card === "simple") $("services").style.display = "none";
+else $("svcList").innerHTML = SERVICES.map(([t, d]) => `<div class="svc"><b>${t}</b><p>${d}</p></div>`).join("");
+
+// 轉傳：打開 LIFF 分享頁，帶同樣的名片資料
+$("forward").href = `https://liff.line.me/${LIFF_ID}${toQuery(p)}`;
+
+// 儲存聯絡人（vCard）
+$("save").onclick = () => {
+  const vcf = [
+    "BEGIN:VCARD", "VERSION:3.0",
+    `N:;${i.name};;;`, `FN:${i.name} ${i.en}`,
+    `ORG:${i.company}`, `TITLE:${i.title} ${i.title_en}`,
+    `TEL;TYPE=CELL:${i.phone}`, `EMAIL;TYPE=WORK:${i.email}`,
+    "END:VCARD",
+  ].join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([vcf], { type: "text/vcard;charset=utf-8" }));
+  a.download = `${i.name}.vcf`;
+  document.body.appendChild(a); a.click(); a.remove();
+};
+</script>
+</body>
+</html>
